@@ -6,6 +6,7 @@
 
 # 2. Filter out by specific feature (UTR, exon, intron, etc...) OPTIONAL
 # bedtools intersect -a peaks.sorted.bed -b 3UTR_hg19_UCSCgenes.bed -u > 3UTR_peaks.bed
+bedtools overla
 
 # 3. Extract the blocks of multiple alignment
 WORK_DIR=/home/labs/schwartzlab/miguelg/WORKSPACE_wexac/Exploration/seq_conservation/m6A/

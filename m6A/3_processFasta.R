@@ -27,7 +27,7 @@ collapseGaps <- function(string1, string2){
 
 # Setting Directories and files ####
 iniDir <- getwd()
-workDir <- "W:/schwartzlab/miguelg/BIGDATA/UCSC/MAF46_vertebrate/outDir/fastaOut"
+workDir <- paste(iniDir, "/fastaSeqs", sep ="")
 setwd(workDir)
 files <- list.files()
 faFiles <- files[grep(pattern = ".fa", x = files)]
@@ -47,7 +47,8 @@ for (FILE in faFiles) {
     species <- unique(c1)
     flag <- c(grep(pattern = "hg19", c1), length(c1)+1); flag2 <- NULL
     for (i in 1:(length(flag)-1)) {flag2[i] <- flag[i+1] - flag[i]}
-    colAssign <- NULL; for (p in 1:length(flag2)){colAssign <- c(colAssign, rep(p, flag2[p]))}
+    colAssign <- NULL; for (p in 1:length(flag2)){
+      colAssign <- c(colAssign, rep(p, flag2[p]))}
     # Sequence merging by species and order
     seqMatrix <- matrix(NA, nrow = length(species), ncol = table(c1)["hg19"])
     rownames(seqMatrix) <- species
@@ -56,21 +57,16 @@ for (FILE in faFiles) {
     }
     # Correcting empty cells
     for (l in 1:ncol(seqMatrix)) {
-      if (sum(is.na(seqMatrix))>0) {
+      if (sum(is.na(seqMatrix)) > 0) {
         x <- seqMatrix[,l]
-        seqMatrix[,l][which(is.na(x))] <- paste(rep(x = "-", mean(na.omit(sapply(x, nchar)))), collapse = "")  
+        seqMatrix[,l][which(is.na(x))] <- paste(rep(x = "-", 
+                              mean(na.omit(sapply(x, nchar)))), collapse = "")  
       }
     }
     # Collapse columns to 1 string
     fasSEQ <- apply(seqMatrix, MARGIN = 1, FUN = paste, collapse = "")
     # Compare sequences with some metric ("Hamming") and build matrix for all results
-    DIST <- NULL
-    for (k in 1:length(fasSEQ)){
-      if (nchar(fasSEQ[1] == nchar(fasSEQ[k]))){
-        DIST[k] <- stringdist(a = fasSEQ[1], b = fasSEQ[k], method = "hamming")
-      }
-      else stop(print("ERROR: Impossible to compare different size sequences"))
-    }
+    DIST <- stringdist(a = fasSEQ[1], b = fasSEQ, method = "hamming")
     names(DIST) <- names(fasSEQ)
     allDist[[substring(FILE,1, nchar(FILE)-3)]] <- DIST  #Merge in list
   }
@@ -92,8 +88,22 @@ for(z in names(allDist)){
   distMATRIX[,z] <- allDist[[z]][rownames(distMATRIX)]
 }
 
+# Presence/absence of sequence matrix
+presMatrix <- matrix(as.numeric(!is.na(as.vector(distMATRIX))), nrow= nrow(distMATRIX))
+colnames(presMatrix) <- colnames(distMATRIX); rownames(presMatrix) <- rownames(distMATRIX)
+
 na_count <- apply(distMATRIX, function(y) sum(is.na(y)) , MARGIN = 2)
 d_count <- length(allSpecies) - na_count
+hist(d_count)
+heatmap(presMatrix[,1:100], col = RColorBrewer::brewer.pal(9, "Spectral"), scale = "none")
+
+distMATRIX[,d_count == length(allSpecies)-20] %>%
+heatmap.2( , col = rev(colorRampPalette(brewer.pal(11, "Spectral"))(n = 1000)), trace = "none",density.info = "none")
+
+#Barplot percentage of alignments present in species
+barplot(rowMeans(presMatrix), 
+        col = colorRampPalette(brewer.pal(11, "Set1"))(n = nrow(presMatrix)),
+        ylim = c(0, 1))
 
 # Go back to initial working directory
 setwd(iniDir)
