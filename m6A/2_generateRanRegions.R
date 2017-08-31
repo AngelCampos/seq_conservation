@@ -2,21 +2,21 @@
 # Author: Miguel Angel Garcia-Campos https://github.com/AngelCampos ############
 
 # Get annotation and BED file with reference peaks
-annot <- read.delim(file = "W:/schwartzlab/miguelg/BIGDATA/UCSC/BED_annotations/3UTR_hg19_UCSCgenes.bed", header = F, stringsAsFactors = F)
-bed <- read.delim("testingPeaks_human.bed", header = F, stringsAsFactors = F)
+annot <- read.delim(file = "~/BIGDATA/UCSC/BED_annotations/3UTR_hg19_UCSCgenes.bed",
+                    header = F, stringsAsFactors = F)
+bed <- read.delim("testPeaks_human.bed", header = F, stringsAsFactors = F)
 
 # Functions ####################################################################
-# Generate a matrix with N number of random region based on a BED format
+# Generate a matrix with N number of random regions (rows) based on a BED format
 # position within the specified annotation
-
-genRanRegions <- function(x, d5, d3, nControls){
+genRanRegions <- function(x, d5, d3, nControls, annot){
   chr <- as.character(x[1])
   coor <- as.numeric(x[2])
-  name <- as.character(x[5])
+  name <- as.character(x[4])
   sub <- annot[annot$V1 == chr,]
   inside <- NULL
   for(i in 1:nrow(sub)){
-    inside[i] <- coor > sub[i,2] & coor < sub[i,3]
+    inside[i] <- coor >= sub[i,2] & coor <= sub[i,3]
   }
   rangeRegion <- NULL
   lim5 <- min(sub[inside,2]) + d5
@@ -29,10 +29,10 @@ genRanRegions <- function(x, d5, d3, nControls){
   }
   nPeaks <- sample(rangeRegion, nControls, replace = F)
   nregions <- matrix(x, nrow = length(nPeaks), ncol = length(x), byrow = T)
-  nregions[,2] <- nPeaks-d5
-  nregions[,3] <- nPeaks+d3
-  nregions[,4] <- 0
-  nregions[,5] <- sapply(name, paste0,".R", 1:length(nPeaks))
+  nregions[,2] <- nPeaks - d5
+  nregions[,3] <- nPeaks + d3 + 1
+  nregions[,5] <- 0
+  nregions[,4] <- sapply(name, paste0,".R", 1:length(nPeaks))
   return(nregions)
 }
 
@@ -42,11 +42,10 @@ mytable <- function(X, fileName){
 }
 
 # Executing ####################################################################
-
+nCont <- 3
 RegionsTable <- NULL
 for (i in 1:nrow(bed)){
-  a <- genRanRegions(bed[i,], 5, 5, 3)
-  RegionsTable <- rbind(RegionsTable, genRanRegions(bed[i,], 5, 5, 3))
+  RegionsTable <- rbind(RegionsTable, genRanRegions(bed[i,], 5, 5, nCont, annot))
 }
 
 mytable(RegionsTable, "randomRegions_testingPeaks_human.bed")

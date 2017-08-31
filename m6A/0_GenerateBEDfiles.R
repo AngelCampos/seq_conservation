@@ -12,7 +12,7 @@ pos <- humantxt[,2]
 strand <- humantxt[,3]
 cScore <- humantxt[,"Classifier.score"]
 peakName <- as.vector(sapply("human_m6Apeak.", paste0, 1:length(chr)))
-humanBED <- cbind(chr, pos, pos, cScore, peakName, strand)
+humanBED <- cbind(chr, pos, pos, peakName, cScore, strand)
 mytable(humanBED, "m6Apeaks_human.bed")
 
 # Mouse BED file
@@ -22,5 +22,5 @@ pos <- mousetxt[,2]
 strand <- mousetxt[,3]
 cScore <- mousetxt[,9]
 peakName <- as.vector(sapply("mouse_m6Apeak.", paste0, 1:length(chr)))
-humanBED <- cbind(chr, pos, pos, cScore, peakName, strand)
+humanBED <- cbind(chr, pos, pos, peakName, cScore, strand)
 mytable(mouseBED, "m6Apeaks_mouse.bed")
