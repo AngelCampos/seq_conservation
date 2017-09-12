@@ -4,9 +4,11 @@
 ################################################################################
 #Load/install packages ####
 library(stringdist)
+library(RColorBrewer)
+library(magrittr)
+library(gplots)
 
 # Custom functions ####
-# collapseGaps()
 # Function to collapse blocks of gaps in two alligned orthologous sequences
 collapseGaps <- function(string1, string2){
   if(nchar(string1) != nchar(string2)){
@@ -92,13 +94,13 @@ for(z in names(allDist)){
 presMatrix <- matrix(as.numeric(!is.na(as.vector(distMATRIX))), nrow= nrow(distMATRIX))
 colnames(presMatrix) <- colnames(distMATRIX); rownames(presMatrix) <- rownames(distMATRIX)
 
-na_count <- apply(distMATRIX, function(y) sum(is.na(y)) , MARGIN = 2)
-d_count <- length(allSpecies) - na_count
+#
+
+d_count <- length(allSpecies) - (apply(distMATRIX, function(y) sum(is.na(y)) , MARGIN = 2))
 hist(d_count)
 heatmap(presMatrix[,1:100], col = RColorBrewer::brewer.pal(9, "Spectral"), scale = "none")
 
-distMATRIX[,d_count == length(allSpecies)-20] %>%
-heatmap.2( , col = rev(colorRampPalette(brewer.pal(11, "Spectral"))(n = 1000)), trace = "none",density.info = "none")
+heatmap.2(distMATRIX[,d_count == length(allSpecies)], col = rev(colorRampPalette(brewer.pal(11, "Spectral"))(n = 1000)), trace = "none",density.info = "none")
 
 #Barplot percentage of alignments present in species
 barplot(rowMeans(presMatrix), 
