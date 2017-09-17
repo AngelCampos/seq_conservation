@@ -21,13 +21,14 @@ Rscript 1_defineRegions.R
 # 2. Generate Random regions for controls
 Rscript 2_generateRanRegions.R
 
-## Testing
+## [Testing]
 bedtools sort -i testPeaks_human_regions.bed > testPeaks_human_regions.sort.bed
 bedtools sort -i randomRegions_testingPeaks_human.bed > test_RanRegions_human.sort.bed
+
 # 3. Extract the blocks of multiple alignment
 WORK_DIR=/$HOME/WORKSPACE_wexac/seq_conservation/m6A/
-REGIONS=testPeaks_human_regions.sort.bed
-REGIONS2=test_RanRegions_human.sort.bed
+REGIONS=testPeaks_human_regions.sort.bed #Tests
+REGIONS2=test_RanRegions_human.sort.bed #Tests
 MAFS=mafs.txt
 MAF_DIR=/$HOME/BIGDATA/UCSC/MAF46_vertebrate/
 MAF_OUTDIR=MAFblocks
@@ -52,3 +53,4 @@ do
 done &
 
 # 5. Perform analytic methodology
+Rscript 3_processFasta.R

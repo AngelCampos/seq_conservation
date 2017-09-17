@@ -107,13 +107,11 @@ barplot(medDistControl, las=2, col= brewer.pal(11, "Spectral"), main = "Median s
 barplot(meanDistControl, las=2, col= brewer.pal(11, "Spectral"), main = "Mean sequence distance - Controls")
 
 spDistPeaks <- distMATRIX(peaks) %>% apply(1, na.omit) %>% sapply(FUN =  median)
-barplot(sort(spDistPeaks), las=2, col= brewer.pal(11, "Spectral"), main = "Median sequence distance - Peaks")
+barplot(spDistPeaks, las=2, col= brewer.pal(11, "Spectral"), main = "Median sequence distance - Peaks")
 
 # Score Peaks for conservation of sequence
 
-
-
-i <- 1
+i <- 7
 x <- rFASTA(peaks[i]) %>% seqDistMulFasta()
 o <- rFASTA(ranCon1[i]) %>% seqDistMulFasta()
 p <- rFASTA(ranCon2[i]) %>% seqDistMulFasta()
